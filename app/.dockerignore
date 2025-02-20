@@ -1,0 +1,5 @@
+__pycache__
+Dockerfile
+.dockignore
+poetry.lock
+pyproject.toml

@@ -1,0 +1,28 @@
+services:
+  db:
+    image: mysql
+    restart: always
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD-SHELL", "mysql -u $$MYSQL_USER -p$$MYSQL_PASSWORD -e 'SHOW TABLES IN todo;'"]
+      interval: 5s
+      retries: 10
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+  
+  api:
+    build: ./app
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    command: /bin/sh -c "alembic upgrade head && uvicorn main:app --host 0.0.0.0 --port 8000"
+    volumes:
+      - .:/usr/backend
+volumes: 
+  mysql_data:
